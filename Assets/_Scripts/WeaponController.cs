@@ -19,7 +19,7 @@ public class WeaponController : MonoBehaviour
         
     }
 
-    void OnCollisionEnter(Collision col)
+    void OnTriggerEnter(Collider col)
     {
         Debug.Log("Hit: " + col.gameObject.name);
 

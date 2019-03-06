@@ -9,6 +9,7 @@ public class HealthController : MonoBehaviour
     public float maxHealth = 10;
     public float currentHealth;
     public string switchSceneOnDeath = "";
+    public AudioSource hitSound;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +28,7 @@ public class HealthController : MonoBehaviour
     public void Damage(float amount)
     {
         currentHealth -= amount;
+        hitSound.Play();
     }
 
     public void Heal(int amount)
@@ -36,7 +38,8 @@ public class HealthController : MonoBehaviour
 
     void Die()
     {
-        this.gameObject.GetComponent<Renderer>().material.color = Color.red;
+        //this.gameObject.GetComponent<Renderer>().material.color = Color.red;
+        
         if (switchSceneOnDeath != "") {
             SceneManager.LoadSceneAsync(switchSceneOnDeath);
         }
