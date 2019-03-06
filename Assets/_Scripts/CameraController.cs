@@ -33,4 +33,10 @@ Update the cameras position to follow the target
             transform.LookAt(target);
         }
     }
+
+    private void Start()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
 }

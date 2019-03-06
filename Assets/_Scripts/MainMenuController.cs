@@ -7,10 +7,13 @@ public class MainMenuController : MonoBehaviour
 {
     public GameObject exitPannel;
 
+    public AudioSource click;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     // Update is called once per frame
@@ -43,5 +46,10 @@ public class MainMenuController : MonoBehaviour
     public void ButtonHandlerExitPromptToggle()
     {
         exitPannel.SetActive(!exitPannel.activeSelf);
+    }
+
+    public void PlayClickSound()
+    {
+        click.Play();
     }
 }
