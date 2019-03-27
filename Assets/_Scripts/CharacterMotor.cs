@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CharacterMotor : MonoBehaviour 
 {
@@ -23,9 +24,28 @@ public class CharacterMotor : MonoBehaviour
     private int animiatorWalkingSpeedLeftID;
     private int animiatorStrikeID;
     private int animiatorJumpID;
+    private int animiatorResetID;
 
+    // dead is true if the chracthewr should not be controlled
+    public Transform startTransform;
+    public bool dead;
+    public int currentTick;
 
+    enum Type { Move, Strike, Jump };
+    private class Action
+    {
+        public Type actionType;
+        public Vector3 position;
+        public Quaternion rotation;
 
+        public Action(Type type, Vector3 position, Quaternion rotation)
+        {
+            this.actionType = type;
+            this.position = position;
+            this.rotation = rotation;
+        }
+    }
+    private Dictionary<int, Action> actions;
 
 
     void Awake()
@@ -35,105 +55,158 @@ public class CharacterMotor : MonoBehaviour
         animiatorWalkingSpeedLeftID = Animator.StringToHash("walkingSpeedLeft");
         animiatorStrikeID = Animator.StringToHash("strike");
         animiatorJumpID = Animator.StringToHash("jump");
+        animiatorResetID = Animator.StringToHash("reset");
 
+        actions = new Dictionary<int, Action>();
+        dead = false;
+        currentTick = 0;
     }
 
-	void Update() 
-	{
+    void Update()
+    {
+        currentTick++;
 
-        if (Input.GetMouseButtonDown(0))
+        // If alive the player should control the movement else replay movement
+        if (!dead)
         {
-            this.GetComponent<Animator>().SetTrigger(animiatorStrikeID);
-        }
-        else
-        {
-
-
-            // if we are on the ground then allow movement
-            if (IsGrounded)
+            if (Input.GetMouseButtonDown(0))
             {
-                float input_v = Input.GetAxis("Vertical");
-                float input_h = Input.GetAxis("Horizontal");
-
-                bool isMoving_v = (input_v != 0);
-                bool isMoving_h = (input_h != 0);
-
-                moveDirection.x = transform.forward.x;
-                moveDirection.z = -transform.right.z;
-
-                if (isMoving_v)
-                {
-                    currentSpeed_v += (acceleration * input_v * Time.deltaTime);
-                    currentSpeed_v = Mathf.Clamp(currentSpeed_v, -maxSpeed, maxSpeed);
-                }
-                else if (currentSpeed_v > 0)
-                {
-                    currentSpeed_v -= (decceleration * Time.deltaTime);
-                    currentSpeed_v = Mathf.Clamp(currentSpeed_v, 0, maxSpeed);
-                }
-                else if (currentSpeed_v < 0)
-                {
-                    currentSpeed_v += (decceleration * Time.deltaTime);
-                    currentSpeed_v = Mathf.Clamp(currentSpeed_v, -maxSpeed, 0);
-                }
-
-                if (isMoving_h)
-                {
-                    currentSpeed_h += (acceleration * input_h * Time.deltaTime);
-                    currentSpeed_h = Mathf.Clamp(currentSpeed_h, -maxSpeed, maxSpeed);
-                }
-                else if (currentSpeed_h > 0)
-                {
-                    currentSpeed_h -= (decceleration * Time.deltaTime);
-                    currentSpeed_h = Mathf.Clamp(currentSpeed_h, 0, maxSpeed);
-                }
-                else if (currentSpeed_h < 0)
-                {
-                    currentSpeed_h += (decceleration * Time.deltaTime);
-                    currentSpeed_h = Mathf.Clamp(currentSpeed_h, -maxSpeed, 0);
-                }
-
-                moveDirection.x *= currentSpeed_v;
-                moveDirection.z *= currentSpeed_h;
-
-                moveDirection.y = Mathf.Max(0, moveDirection.y);
-
-
-                if (Input.GetButton("Jump") && 
-                    !(this.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Jumping") ||
-                    this.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Jump")))
-                {
-                    this.GetComponent<Animator>().SetTrigger(animiatorJumpID);
-                    //if (this.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Jump")) {
-                    //    StartCoroutine(DelayJump());
-                    //}
-
-
-                }
+                Strike();
             }
             else
             {
-                moveDirection.y -= (gravity * Time.deltaTime);
+
+                Move(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"), Input.GetAxis("Mouse X"));
+
+                if (Input.GetButton("Jump"))
+                {
+                    Jump();
+                }
+                else
+                {
+                    if (currentTick % 5 == 0)
+                    {
+                        actions.Add(currentTick, new Action(Type.Move, this.gameObject.transform.position, this.gameObject.transform.localRotation));
+                    }
+                }
             }
-
-            //float rotation = (Input.GetAxis("Horizontal") * rotationSpeed) * Time.deltaTime;
-
-            //transform.Rotate(0, rotation, 0);
-
-            transform.Rotate(new Vector3(0, Input.GetAxis("Mouse X"), 0) * Time.deltaTime * rotationSpeed);
-
-            characterController.Move(moveDirection * Time.deltaTime);
-
-            this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedFowardID, currentSpeed_v);
-            this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, currentSpeed_h);
+        }
+        else
+        {
+            if (actions.ContainsKey(currentTick))
+            {
+                Action currentAction = actions[currentTick];
+                switch (currentAction.actionType)
+                {
+                    case Type.Strike:
+                        Strike();
+                        break;
+                    case Type.Move:
+                        // TODO be better
+                        Debug.Log("Move Character");
+                        this.gameObject.transform.SetPositionAndRotation(currentAction.position, currentAction.rotation);
+                        break;
+                    case Type.Jump:
+                        Jump();
+                        break;
+                }
+            }
         }
     }
 
-    IEnumerator DelayJump()
+    void Jump()
     {
-        yield return new WaitForSeconds(1);
-        moveDirection.y = jumpSpeed;
+        if (!(this.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Jumping") ||
+            this.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Jump")))
+        {
+            this.GetComponent<Animator>().SetTrigger(animiatorJumpID);
+            if (!dead)
+            {
+                actions.Add(currentTick, new Action(Type.Jump, this.gameObject.transform.position, this.gameObject.transform.localRotation));
+            }
+        }
     }
 
+    void Strike()
+    {
+        this.GetComponent<Animator>().SetTrigger(animiatorStrikeID);
+        if (!dead)
+        {
+            actions.Add(currentTick, new Action(Type.Strike, this.gameObject.transform.position, this.gameObject.transform.localRotation));
+        }
+    }
 
+    void Move(float input_v, float input_h, float input_x)
+    {
+        // if we are on the ground then allow movement
+        if (IsGrounded)
+        {
+
+            bool isMoving_v = (input_v != 0);
+            bool isMoving_h = (input_h != 0);
+
+            moveDirection.x = transform.forward.x;
+            moveDirection.z = transform.right.z;
+
+            if (isMoving_v)
+            {
+                currentSpeed_v += (acceleration * input_v * Time.deltaTime);
+                currentSpeed_v = Mathf.Clamp(currentSpeed_v, -maxSpeed, maxSpeed);
+            }
+            else if (currentSpeed_v > 0)
+            {
+                currentSpeed_v -= (decceleration * Time.deltaTime);
+                currentSpeed_v = Mathf.Clamp(currentSpeed_v, 0, maxSpeed);
+            }
+            else if (currentSpeed_v < 0)
+            {
+                currentSpeed_v += (decceleration * Time.deltaTime);
+                currentSpeed_v = Mathf.Clamp(currentSpeed_v, -maxSpeed, 0);
+            }
+
+            if (isMoving_h)
+            {
+                currentSpeed_h += (acceleration * input_h * Time.deltaTime);
+                currentSpeed_h = Mathf.Clamp(currentSpeed_h, -maxSpeed, maxSpeed);
+            }
+            else if (currentSpeed_h > 0)
+            {
+                currentSpeed_h -= (decceleration * Time.deltaTime);
+                currentSpeed_h = Mathf.Clamp(currentSpeed_h, 0, maxSpeed);
+            }
+            else if (currentSpeed_h < 0)
+            {
+                currentSpeed_h += (decceleration * Time.deltaTime);
+                currentSpeed_h = Mathf.Clamp(currentSpeed_h, -maxSpeed, 0);
+            }
+
+            moveDirection.x *= currentSpeed_v;
+            moveDirection.z *= currentSpeed_h;
+
+            moveDirection.y = Mathf.Max(0, moveDirection.y);
+                
+        }
+        else
+        {
+            moveDirection.y -= (gravity * Time.deltaTime);
+        }
+
+        transform.Rotate(new Vector3(0, input_x, 0) * Time.deltaTime * rotationSpeed);
+
+        characterController.Move(moveDirection * Time.deltaTime);
+
+        this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedFowardID, currentSpeed_v);
+        this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, currentSpeed_h);
+    }
+
+    public void Reset()
+    {
+        Debug.Log("Resetting Character");
+        this.gameObject.transform.position = startTransform.position;
+        this.gameObject.transform.localRotation = startTransform.localRotation;
+        this.currentTick = 0;
+        this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedFowardID, 0);
+        this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, 0);
+        this.GetComponent<Animator>().SetTrigger(animiatorResetID);
+    }
 }

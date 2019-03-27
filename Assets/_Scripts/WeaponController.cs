@@ -21,11 +21,15 @@ public class WeaponController : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-        Debug.Log("Hit: " + col.gameObject.name);
-
         if (col.gameObject.tag == "Dummy")
         {
             Debug.Log("Hit Dummy: " + col.gameObject.name);
+            col.gameObject.GetComponent<HealthController>().Damage(damage);
+        }
+
+        if (col.gameObject.tag == "Enemy")
+        {
+            Debug.Log("Hit Enemy: " + col.gameObject.name);
             col.gameObject.GetComponent<HealthController>().Damage(damage);
         }
     }
