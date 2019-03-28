@@ -822,6 +822,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
+  enemy: 0
 --- !u!1 &5939952396288388774
 GameObject:
   m_ObjectHideFlags: 0
@@ -1905,7 +1906,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a296d28c61dd644096b07a1c861cbd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
+  maxHealth: 20
   currentHealth: 0
   switchSceneOnDeath: 
   hitSound: {fileID: 0}

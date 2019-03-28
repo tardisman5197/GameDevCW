@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44950038, g: 0.4964947, b: 0.5591457, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2723,6 +2723,7 @@ GameObject:
   - component: {fileID: 896122832}
   - component: {fileID: 896122831}
   - component: {fileID: 896122834}
+  - component: {fileID: 896122835}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2811,6 +2812,20 @@ MonoBehaviour:
   follow: 1
   displacementY: 1.5
   easing: 0.1
+--- !u!114 &896122835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896122830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b265aa950dd557c498c32daacf18dc3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lvl1: {fileID: 1225448735}
+  lvl2: {fileID: 903442097}
 --- !u!1 &903442097
 GameObject:
   m_ObjectHideFlags: 0
@@ -2868,6 +2883,7 @@ MonoBehaviour:
   switchSceneOnDeath: 
   hitSound: {fileID: 903442102}
   player: 0
+  scoreUI: {fileID: 0}
 --- !u!136 &903442100
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3702,9 +3718,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 10
   currentHealth: 0
-  switchSceneOnDeath: 
+  switchSceneOnDeath: Lvl1
   hitSound: {fileID: 1225448740}
   player: 0
+  scoreUI: {fileID: 0}
 --- !u!54 &1225448739
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6063,6 +6080,7 @@ MonoBehaviour:
   switchSceneOnDeath: MainMenu
   hitSound: {fileID: 1921297394}
   player: 0
+  scoreUI: {fileID: 0}
 --- !u!136 &1921297392
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -6713,6 +6731,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4708643222779033389, guid: 2031fb7ff3ce209459676a4454a2b828,
+        type: 3}
+      propertyPath: switchSceneOnDeath
+      value: Lvl1
+      objectReference: {fileID: 0}
     - target: {fileID: 4708643223051362574, guid: 2031fb7ff3ce209459676a4454a2b828,
         type: 3}
       propertyPath: m_Name

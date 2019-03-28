@@ -17,18 +17,24 @@ public class HealthController : MonoBehaviour
 
     public bool player;
 
+    public GameObject scoreUI;
+
     // Start is called before the first frame update
     void Start()
     {
         this.currentHealth = maxHealth;
         this.animiatorDiedID = Animator.StringToHash("death");
         this.dead = false;
+        scoreUI = GameObject.Find("Score");
+        if (player)
+        {
+            scoreUI.GetComponent<ScoreUI>().UpdateHealth(currentHealth);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-
         if (player)
         {
             if (Input.GetKeyDown(KeyCode.X))
@@ -51,11 +57,20 @@ public class HealthController : MonoBehaviour
         currentHealth -= amount;
         Debug.Log("Damaged: " + currentHealth);
         //hitSound.Play();
+
+        if (player)
+        {
+            scoreUI.GetComponent<ScoreUI>().UpdateHealth(currentHealth);
+        }
     }
 
     public void Heal(int amount)
     {
         currentHealth += amount;
+        if (player)
+        {
+            scoreUI.GetComponent<ScoreUI>().UpdateHealth(currentHealth);
+        }
     }
 
     void Die()
@@ -66,7 +81,6 @@ public class HealthController : MonoBehaviour
 
         Debug.Log("Died!");
         this.dead = true;
-        this.GetComponent<Animator>().SetTrigger(animiatorDiedID);
 
         // If the current player
         if (player)
@@ -79,6 +93,12 @@ public class HealthController : MonoBehaviour
         if (transform.GetComponent<EnemyController>() != null)
         {
             transform.GetComponent<EnemyController>().Dead();
+            GameObject.Find("Main Camera").GetComponent<LevelController>().EnemyDeath();
+        }
+
+        if (this.GetComponent<Animator>() != null)
+        {
+            this.GetComponent<Animator>().SetTrigger(animiatorDiedID);
         }
     }
 }
