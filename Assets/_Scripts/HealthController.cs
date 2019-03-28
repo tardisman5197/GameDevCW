@@ -35,13 +35,13 @@ public class HealthController : MonoBehaviour
             {
                 currentHealth = 0;
             }
+        }
 
-            if (currentHealth <= 0)
+        if (currentHealth <= 0)
+        {
+            if (!dead)
             {
-                if (!dead)
-                {
-                    Die();
-                }
+                Die();
             }
         }
     }
@@ -49,6 +49,7 @@ public class HealthController : MonoBehaviour
     public void Damage(float amount)
     {
         currentHealth -= amount;
+        Debug.Log("Damaged: " + currentHealth);
         //hitSound.Play();
     }
 
@@ -59,8 +60,6 @@ public class HealthController : MonoBehaviour
 
     void Die()
     {
-        //this.gameObject.GetComponent<Renderer>().material.color = Color.red;
-        
         if (switchSceneOnDeath != "") {
             SceneManager.LoadSceneAsync(switchSceneOnDeath);
         }
@@ -69,11 +68,17 @@ public class HealthController : MonoBehaviour
         this.dead = true;
         this.GetComponent<Animator>().SetTrigger(animiatorDiedID);
 
+        // If the current player
         if (player)
         {
             Debug.Log("Player Dead");
             GameObject.Find("Main Camera").GetComponent<LevelController>().PlayerDeath(this.gameObject);
         }
-        //this.transform.Rotate(new Vector3(90f, 0f));
+
+        // If an enemy
+        if (transform.GetComponent<EnemyController>() != null)
+        {
+            transform.GetComponent<EnemyController>().Dead();
+        }
     }
 }

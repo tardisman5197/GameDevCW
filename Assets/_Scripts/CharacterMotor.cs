@@ -27,7 +27,8 @@ public class CharacterMotor : MonoBehaviour
     private int animiatorResetID;
 
     // dead is true if the chracthewr should not be controlled
-    public Transform startTransform;
+    public Vector3 startPosition;
+    public Quaternion startRotation;
     public bool dead;
     public int currentTick;
 
@@ -37,12 +38,16 @@ public class CharacterMotor : MonoBehaviour
         public Type actionType;
         public Vector3 position;
         public Quaternion rotation;
+        public float speed_v;
+        public float speed_h;
 
-        public Action(Type type, Vector3 position, Quaternion rotation)
+        public Action(Type type, Vector3 position, Quaternion rotation, float v, float h)
         {
             this.actionType = type;
             this.position = position;
             this.rotation = rotation;
+            this.speed_v = v;
+            this.speed_h = h;
         }
     }
     private Dictionary<int, Action> actions;
@@ -76,19 +81,11 @@ public class CharacterMotor : MonoBehaviour
             else
             {
 
-                Move(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"), Input.GetAxis("Mouse X"));
-
                 if (Input.GetButton("Jump"))
                 {
                     Jump();
                 }
-                else
-                {
-                    if (currentTick % 5 == 0)
-                    {
-                        actions.Add(currentTick, new Action(Type.Move, this.gameObject.transform.position, this.gameObject.transform.localRotation));
-                    }
-                }
+                Move(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"), Input.GetAxis("Mouse X"));
             }
         }
         else
@@ -102,11 +99,12 @@ public class CharacterMotor : MonoBehaviour
                         Strike();
                         break;
                     case Type.Move:
-                        // TODO be better
-                        Debug.Log("Move Character");
                         this.gameObject.transform.SetPositionAndRotation(currentAction.position, currentAction.rotation);
+                        this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedFowardID, currentAction.speed_v);
+                        this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, currentAction.speed_h);
                         break;
                     case Type.Jump:
+                        Debug.Log("Jump");
                         Jump();
                         break;
                 }
@@ -122,7 +120,10 @@ public class CharacterMotor : MonoBehaviour
             this.GetComponent<Animator>().SetTrigger(animiatorJumpID);
             if (!dead)
             {
-                actions.Add(currentTick, new Action(Type.Jump, this.gameObject.transform.position, this.gameObject.transform.localRotation));
+                if (!actions.ContainsKey(currentTick))
+                {
+                    actions.Add(currentTick, new Action(Type.Jump, this.gameObject.transform.position, this.gameObject.transform.localRotation, 0, 0));
+                }
             }
         }
     }
@@ -132,7 +133,10 @@ public class CharacterMotor : MonoBehaviour
         this.GetComponent<Animator>().SetTrigger(animiatorStrikeID);
         if (!dead)
         {
-            actions.Add(currentTick, new Action(Type.Strike, this.gameObject.transform.position, this.gameObject.transform.localRotation));
+            if (!actions.ContainsKey(currentTick))
+            {
+                actions.Add(currentTick, new Action(Type.Strike, this.gameObject.transform.position, this.gameObject.transform.localRotation, 0, 0));
+            }
         }
     }
 
@@ -193,17 +197,27 @@ public class CharacterMotor : MonoBehaviour
 
         transform.Rotate(new Vector3(0, input_x, 0) * Time.deltaTime * rotationSpeed);
 
-        characterController.Move(moveDirection * Time.deltaTime);
+        //characterController.Move(moveDirection * Time.deltaTime);
 
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedFowardID, currentSpeed_v);
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, currentSpeed_h);
+
+        if (!actions.ContainsKey(currentTick))
+        {
+            actions.Add(currentTick, new Action(Type.Move, this.gameObject.transform.position, this.gameObject.transform.localRotation, currentSpeed_v, currentSpeed_h));
+        }
     }
 
     public void Reset()
     {
         Debug.Log("Resetting Character");
-        this.gameObject.transform.position = startTransform.position;
-        this.gameObject.transform.localRotation = startTransform.localRotation;
+        // Broken
+        this.GetComponent<Animator>().applyRootMotion = false;
+        this.GetComponent<Animator>().rootPosition = startPosition;
+        transform.parent.transform.SetPositionAndRotation(startPosition, startRotation);
+        this.GetComponent<Animator>().applyRootMotion = true;
+
+
         this.currentTick = 0;
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedFowardID, 0);
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, 0);

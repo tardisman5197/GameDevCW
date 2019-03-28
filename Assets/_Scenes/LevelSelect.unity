@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44950104, g: 0.49649572, b: 0.55914646, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2076,7 +2076,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &648345054
 PrefabInstance:
@@ -2334,7 +2334,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 20, y: 40, z: 0}
 --- !u!4 &737862738
 Transform:
@@ -2792,7 +2792,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 20, y: 30, z: 0}
 --- !u!114 &896122834
 MonoBehaviour:
@@ -2806,7 +2806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdabbdf33ad08884a96f973062d3f84a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 1128047955}
+  target: {fileID: 1433178003}
   distanceFromTarget: 5
   follow: 1
   displacementY: 1.5
@@ -2867,6 +2867,7 @@ MonoBehaviour:
   currentHealth: 0
   switchSceneOnDeath: 
   hitSound: {fileID: 903442102}
+  player: 0
 --- !u!136 &903442100
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3471,12 +3472,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1124229624}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1128047955 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1128047955, guid: bc6a536a6df0a154ab6df6ae0f996fac,
-    type: 3}
-  m_PrefabInstance: {fileID: 7975437116120524454}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1157738963
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3709,6 +3704,7 @@ MonoBehaviour:
   currentHealth: 0
   switchSceneOnDeath: 
   hitSound: {fileID: 1225448740}
+  player: 0
 --- !u!54 &1225448739
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4381,6 +4377,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 458612, guid: 678f5de964d546548982f612d67c303c,
     type: 3}
   m_PrefabInstance: {fileID: 1406857612}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1433178003 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7110012798915655037, guid: bc6a536a6df0a154ab6df6ae0f996fac,
+    type: 3}
+  m_PrefabInstance: {fileID: 7975437116120524454}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1433662902
 PrefabInstance:
@@ -6060,6 +6062,7 @@ MonoBehaviour:
   currentHealth: 0
   switchSceneOnDeath: MainMenu
   hitSound: {fileID: 1921297394}
+  player: 0
 --- !u!136 &1921297392
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -6537,7 +6540,7 @@ Transform:
   - {fileID: 1105987633}
   - {fileID: 21175803}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2115389094
 PrefabInstance:
@@ -7283,6 +7286,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5939952396848430896, guid: bc6a536a6df0a154ab6df6ae0f996fac,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 5939952396848430896, guid: bc6a536a6df0a154ab6df6ae0f996fac,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 250
+      objectReference: {fileID: 0}
     - target: {fileID: 7975437116831121701, guid: bc6a536a6df0a154ab6df6ae0f996fac,
         type: 3}
       propertyPath: m_Name

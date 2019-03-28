@@ -86,12 +86,13 @@ public class LevelController : MonoBehaviour
     void NewPlayer()
     {
         // Update the start position
-        startTransform.position = new Vector3(startTransform.position.x + 1, startTransform.position.y, startTransform.position.z);
+        startTransform.position = new Vector3(startTransform.position.x - 1, startTransform.position.y, startTransform.position.z);
 
         // Create the new player
         Debug.Log("Creating new player");
         GameObject newPlayer = Instantiate(player, startTransform);
-        newPlayer.GetComponent<CharacterMotor>().startTransform = startTransform;
+        newPlayer.GetComponent<CharacterMotor>().startPosition = startTransform.position;
+        newPlayer.GetComponent<CharacterMotor>().startRotation = startTransform.rotation;
         newPlayer.GetComponent<HealthController>().player = true;
 
         // Set the camera to the new player
