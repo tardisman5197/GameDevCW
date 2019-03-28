@@ -26,7 +26,7 @@ public class CharacterMotor : MonoBehaviour
     private int animiatorJumpID;
     private int animiatorResetID;
 
-    // dead is true if the chracthewr should not be controlled
+    // dead is true if the chracther should not be controlled
     public Vector3 startPosition;
     public Quaternion startRotation;
     public bool dead;
@@ -72,7 +72,7 @@ public class CharacterMotor : MonoBehaviour
         currentTick++;
 
         // If alive the player should control the movement else replay movement
-        if (!dead)
+        if (!dead && !GameObject.Find("Main Camera").GetComponent<PauseController>().pauseMenu.activeSelf)
         {
             if (Input.GetMouseButtonDown(0))
             {
