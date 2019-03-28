@@ -1,21 +1,41 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelController : MonoBehaviour
 {
     // army stores the starting layout of the enemy
     public GameObject army;
+    public int noOfEnemyDeaths;
     // player stores the prefab of a player
     public GameObject player;
     public Transform startTransform;
     // players stores the previous lives of a player.
     public List<GameObject> players;
 
+    public GameObject infoUI;
+
+    [Serializable]
+    public struct LvlSave
+    {
+        public int deaths;
+
+        public LvlSave(int deaths)
+        {
+            this.deaths = deaths;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         players = new List<GameObject>();
+        noOfEnemyDeaths = 0;
         SpawnArmy();
         NewPlayer();
     }
@@ -23,7 +43,12 @@ public class LevelController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (army.transform.childCount <= noOfEnemyDeaths)
+        {
+            Debug.Log("Won!!");
+            Save();
+            SceneManager.LoadSceneAsync("LevelSelect");
+        }
     }
 
     // AddPlayer resets the player's previous character
@@ -66,6 +91,7 @@ public class LevelController : MonoBehaviour
     // ResetScene clears the level and respawns the players and army. 
     void ResetScene()
     {
+        noOfEnemyDeaths = 0;
         CleanUpScene();
         SpawnArmy();
         SpawnPlayers();
@@ -75,26 +101,53 @@ public class LevelController : MonoBehaviour
     // players list.
     public void PlayerDeath(GameObject player)
     {
+
         AddPlayer(player);
         ResetScene();
 
         Debug.Log("New player");
         NewPlayer();
+
+        infoUI.GetComponent<ScoreUI>().AddDeath();
     }
 
     // NewPlayer 
     void NewPlayer()
     {
         // Update the start position
-        startTransform.position = new Vector3(startTransform.position.x + 1, startTransform.position.y, startTransform.position.z);
+        startTransform.position = new Vector3(startTransform.position.x - 1, startTransform.position.y, startTransform.position.z);
 
         // Create the new player
         Debug.Log("Creating new player");
         GameObject newPlayer = Instantiate(player, startTransform);
-        newPlayer.GetComponent<CharacterMotor>().startTransform = startTransform;
+        newPlayer.GetComponent<CharacterMotor>().startPosition = startTransform.position;
+        newPlayer.GetComponent<CharacterMotor>().startRotation = startTransform.rotation;
         newPlayer.GetComponent<HealthController>().player = true;
 
         // Set the camera to the new player
         this.gameObject.GetComponent<CameraController>().target = newPlayer.transform.Find("CameraTarget");
+    }
+
+    // EnemyDeath is used to update the number of enmeys killed.
+    public void EnemyDeath()
+    {
+        noOfEnemyDeaths++;
+    }
+
+    // Save creates an xml document contating the lvl information
+    public void Save()
+    {
+        System.IO.Directory.CreateDirectory("saves");
+        string filename = "saves/lvl1.xml";
+        XmlDocument xmlDocument = new XmlDocument();
+        LvlSave state = new LvlSave(players.Count);
+        XmlSerializer serializer = new XmlSerializer(typeof(LvlSave));
+        using (MemoryStream stream = new MemoryStream())
+        {
+            serializer.Serialize(stream, state);
+            stream.Position = 0;
+            xmlDocument.Load(stream);
+            xmlDocument.Save(filename);
+        }
     }
 }

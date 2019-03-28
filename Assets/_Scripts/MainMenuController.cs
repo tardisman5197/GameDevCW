@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,12 +25,15 @@ public class MainMenuController : MonoBehaviour
 
     public void ButtonHandlerPlay()
     {
+        // New game so delete saves
+        Directory.Delete("saves", true);
         SceneManager.LoadSceneAsync("LevelSelect");
+
     }
 
     public void ButtonHandlerLoad()
     {
-
+        SceneManager.LoadSceneAsync("LevelSelect");
     }
 
     public void ButtonHandlerControls()
