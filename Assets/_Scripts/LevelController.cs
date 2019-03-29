@@ -12,9 +12,13 @@ public class LevelController : MonoBehaviour
     // army stores the starting layout of the enemy
     public GameObject army;
     public int noOfEnemyDeaths;
+
     // player stores the prefab of a player
     public GameObject player;
+
+    // startTransform stores the location of the next player to spawn
     public Transform startTransform;
+
     // players stores the previous lives of a player.
     private class PastPlayer {
         public Dictionary<int, CharacterMotor.Action> actions;
@@ -28,10 +32,13 @@ public class LevelController : MonoBehaviour
             this.rotation = rotation;
         }
     }
+    // players is the past lives of a player
     private List<PastPlayer> players;
 
+    // infoUI is the HUD 
     public GameObject infoUI;
 
+    // LvlSave is used to store the score of the player
     [Serializable]
     public struct LvlSave
     {
@@ -48,6 +55,8 @@ public class LevelController : MonoBehaviour
     {
         players = new List<PastPlayer>();
         noOfEnemyDeaths = 0;
+
+        // setup the scene
         SpawnArmy();
         NewPlayer();
     }
@@ -55,6 +64,7 @@ public class LevelController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Check if the player has won
         if (army.transform.childCount <= noOfEnemyDeaths)
         {
             Debug.Log("Won!!");
@@ -67,9 +77,6 @@ public class LevelController : MonoBehaviour
     // to the start position and adds the player to the list.
     void AddPlayer(GameObject newPlayer)
     {
-        newPlayer.GetComponent<CharacterMotor>().dead = true;
-        newPlayer.GetComponent<HealthController>().player = false;
-
         players.Add(new PastPlayer(
             newPlayer.GetComponent<CharacterMotor>().GetActions(),
             newPlayer.GetComponent<CharacterMotor>().startPosition,
@@ -86,6 +93,8 @@ public class LevelController : MonoBehaviour
         {
             Destroy(enemys[i]);
         }
+
+        // Remove all the players from the scene
         GameObject[] playerObjs = GameObject.FindGameObjectsWithTag("Player");
         for (int i = 0; i < playerObjs.Length; i++)
         {
@@ -127,6 +136,7 @@ public class LevelController : MonoBehaviour
     {
 
         AddPlayer(player);
+
         ResetScene();
 
         Debug.Log("New player");
@@ -139,10 +149,9 @@ public class LevelController : MonoBehaviour
     void NewPlayer()
     {
         // Update the start position
-        startTransform.position = new Vector3(startTransform.position.x - 1, startTransform.position.y, startTransform.position.z);
+        startTransform.position = new Vector3(startTransform.position.x - 1, startTransform.position.y, startTransform.position.z + 1);
 
         // Create the new player
-        Debug.Log("Creating new player");
         GameObject newPlayer = Instantiate(player, startTransform);
         newPlayer.GetComponent<CharacterMotor>().startPosition = startTransform.position;
         newPlayer.GetComponent<CharacterMotor>().startRotation = startTransform.rotation;

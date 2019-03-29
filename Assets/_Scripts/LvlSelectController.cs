@@ -9,9 +9,11 @@ using UnityEngine.UI;
 
 public class LvlSelectController : MonoBehaviour
 {
+    // Dummie Labels
     public Text lvl1;
     public Text lvl2;
 
+    // LvlSave is used for loading in scores
     [Serializable]
     public struct LvlSave
     {
@@ -26,6 +28,8 @@ public class LvlSelectController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Load in the scores of all the rounds
+
         LvlSave save = Load("saves/Lvl1.xml");
         if (save.deaths > -1)
         {   
@@ -65,7 +69,8 @@ public class LvlSelectController : MonoBehaviour
                 }
             }
 
-            return state;        }
+            return state;
+        }
         return state;
 
     }

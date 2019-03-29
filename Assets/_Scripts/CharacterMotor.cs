@@ -6,32 +6,32 @@ public class CharacterMotor : MonoBehaviour
 {
 	public bool IsGrounded { get {return characterController.isGrounded;}}
 
+    // Movement variables
 	public float speed = 10.0f;
 	public float jumpSpeed = 10.0f;
 	public float gravity = 20.0f;
 	public float rotationSpeed = 100.0f;
-
 	public float currentSpeed_v = 0.0f;
     public float currentSpeed_h = 0.0f;
     public float maxSpeed = 10.0f;
 	public float acceleration = 10.0f;
 	public float decceleration = 20.0f;
-
 	private Vector3 moveDirection = Vector3.zero;
+
 	private CharacterController characterController;
 
+    // Animation IDs
     private int animiatorWalkingSpeedFowardID;
     private int animiatorWalkingSpeedLeftID;
     private int animiatorStrikeID;
     private int animiatorJumpID;
     private int animiatorResetID;
 
-    // dead is true if the chracther should not be controlled
+    // Variables for storing actions
     public Vector3 startPosition;
     public Quaternion startRotation;
     public bool dead;
     public int currentTick;
-
     public enum Type { Move, Strike, Jump };
     public class Action
     {
@@ -56,6 +56,7 @@ public class CharacterMotor : MonoBehaviour
     void Awake()
 	{
 		characterController = GetComponent<CharacterController>();
+
         animiatorWalkingSpeedFowardID = Animator.StringToHash("walkingSpeedFoward");
         animiatorWalkingSpeedLeftID = Animator.StringToHash("walkingSpeedLeft");
         animiatorStrikeID = Animator.StringToHash("strike");
@@ -71,7 +72,7 @@ public class CharacterMotor : MonoBehaviour
     {
         currentTick++;
 
-        // If alive the player should control the movement else replay movement
+        // If alive and not paused the player should control the movement else replay movement
         if (!dead && !GameObject.Find("Main Camera").GetComponent<PauseController>().pauseMenu.activeSelf)
         {
             if (Input.GetMouseButtonDown(0))
@@ -104,7 +105,6 @@ public class CharacterMotor : MonoBehaviour
                         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, currentAction.speed_h);
                         break;
                     case Type.Jump:
-                        Debug.Log("Jump");
                         Jump();
                         break;
                 }
@@ -112,14 +112,20 @@ public class CharacterMotor : MonoBehaviour
         }
     }
 
+    // Jump playes the jump animation
     void Jump()
     {
+        // Check if not already jumping
         if (!(this.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Jumping") ||
             this.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Jump")))
         {
+            // Start jump animation
             this.GetComponent<Animator>().SetTrigger(animiatorJumpID);
+
+            // Check if the chracter is not a previous life
             if (!dead)
             {
+                // Add the action to the list
                 if (!actions.ContainsKey(currentTick))
                 {
                     actions.Add(currentTick, new Action(Type.Jump, this.gameObject.transform.position, this.gameObject.transform.localRotation, 0, 0));
@@ -128,11 +134,16 @@ public class CharacterMotor : MonoBehaviour
         }
     }
 
+    // Strike plays the attack animation
     void Strike()
     {
+        // Play the attack animation
         this.GetComponent<Animator>().SetTrigger(animiatorStrikeID);
+
+        // Check if not a previous player life
         if (!dead)
         {
+            // Add action to actions
             if (!actions.ContainsKey(currentTick))
             {
                 actions.Add(currentTick, new Action(Type.Strike, this.gameObject.transform.position, this.gameObject.transform.localRotation, 0, 0));
@@ -140,6 +151,7 @@ public class CharacterMotor : MonoBehaviour
         }
     }
 
+    // Move updates the players postion
     void Move(float input_v, float input_h, float input_x)
     {
         // if we are on the ground then allow movement
@@ -197,28 +209,30 @@ public class CharacterMotor : MonoBehaviour
 
         transform.Rotate(new Vector3(0, input_x, 0) * Time.deltaTime * rotationSpeed);
 
-        //characterController.Move(moveDirection * Time.deltaTime);
-
+        // Play the animation of walking
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedFowardID, currentSpeed_v);
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, currentSpeed_h);
 
+        // Add the action to the list
         if (!actions.ContainsKey(currentTick))
         {
             actions.Add(currentTick, new Action(Type.Move, this.gameObject.transform.position, this.gameObject.transform.localRotation, currentSpeed_v, currentSpeed_h));
         }
     }
 
+    // Reset is called if the character is a replay of a past life
     public void Reset(Dictionary<int, Action> actions)
     {
-        Debug.Log("Resetting Character");
         dead = true;
         this.actions = actions;
         this.currentTick = 0;
+
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedFowardID, 0);
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, 0);
         this.GetComponent<Animator>().SetTrigger(animiatorResetID);
     }
 
+    // GetActions retuns the list of actions that the chracter has taken
     public Dictionary<int, Action> GetActions()
     {
         return actions;

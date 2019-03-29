@@ -17,12 +17,8 @@ public class MainMenuController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    // ButtonHandlerPlay is called when the new game button
+    // is pressed
     public void ButtonHandlerPlay()
     {
         // New game so delete saves
@@ -31,22 +27,30 @@ public class MainMenuController : MonoBehaviour
 
     }
 
+    // ButtonHandlerLoad is called when the load game button
+    // is pressed
     public void ButtonHandlerLoad()
     {
         SceneManager.LoadSceneAsync("LevelSelect");
     }
 
+    // ButtonHandlerControls is called if the controls button
+    // is pressed
     public void ButtonHandlerControls()
     {
 
     }
 
+    // ButtonHandlerExit is called if the exit yes button
+    // is pressed
     public void ButtonHandlerExit()
     {
         Debug.Log("Quiting Application");
         Application.Quit();
     }
 
+    // ButtonHandlerExitPromtToggle is called if the exit button
+    // or the exit no button is pressed
     public void ButtonHandlerExitPromptToggle()
     {
         exitPannel.SetActive(!exitPannel.activeSelf);

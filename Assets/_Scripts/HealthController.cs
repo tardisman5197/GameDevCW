@@ -5,36 +5,39 @@ using UnityEngine.SceneManagement;
 
 public class HealthController : MonoBehaviour
 {
-
     public float maxHealth = 10;
     public float currentHealth;
     public string switchSceneOnDeath = "";
     public AudioSource hitSound;
 
-    private int animiatorDiedID;
-
     private bool dead;
 
+    // Animation IDs
+    private int animiatorDiedID;
+
+    // player is true if this charactor is the controlled by the player
     public bool player;
 
+    // scoreUI is the HUD
     public GameObject scoreUI;
 
     // Start is called before the first frame update
     void Start()
     {
         this.currentHealth = maxHealth;
-        this.animiatorDiedID = Animator.StringToHash("death");
         this.dead = false;
+
+        this.animiatorDiedID = Animator.StringToHash("death");
+
         scoreUI = GameObject.Find("Score");
-        if (player)
-        {
-            scoreUI.GetComponent<ScoreUI>().UpdateHealth(currentHealth);
-        }
+
+        UpdateUI();
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Debug tool to kill player
         if (player)
         {
             if (Input.GetKeyDown(KeyCode.X))
@@ -43,6 +46,7 @@ public class HealthController : MonoBehaviour
             }
         }
 
+        // Check if the chractor is dead
         if (currentHealth <= 0)
         {
             if (!dead)
@@ -52,40 +56,39 @@ public class HealthController : MonoBehaviour
         }
     }
 
+    // Damage is used to reduce the health of the charactor
     public void Damage(float amount)
     {
         currentHealth -= amount;
-        Debug.Log("Damaged: " + currentHealth);
+
         //hitSound.Play();
 
-        if (player)
-        {
-            scoreUI.GetComponent<ScoreUI>().UpdateHealth(currentHealth);
-        }
+        // Update the UI if this is the player
+        UpdateUI();
     }
 
+    // Heal is used to increase the chractor's health
     public void Heal(int amount)
     {
         currentHealth += amount;
-        if (player)
-        {
-            scoreUI.GetComponent<ScoreUI>().UpdateHealth(currentHealth);
-        }
+
+        UpdateUI();
     }
 
+    // Die executes the actions that should take place in the
+    // event of this chractor's death
     void Die()
     {
+        // If the scene should change change it
         if (switchSceneOnDeath != "") {
             SceneManager.LoadSceneAsync(switchSceneOnDeath);
         }
 
-        Debug.Log("Died!");
         this.dead = true;
 
         // If the current player
         if (player)
         {
-            Debug.Log("Player Dead");
             GameObject.Find("Main Camera").GetComponent<LevelController>().PlayerDeath(this.gameObject);
         }
 
@@ -93,12 +96,24 @@ public class HealthController : MonoBehaviour
         if (transform.GetComponent<EnemyController>() != null)
         {
             transform.GetComponent<EnemyController>().Dead();
+
             GameObject.Find("Main Camera").GetComponent<LevelController>().EnemyDeath();
         }
 
+        // Play death animation
         if (this.GetComponent<Animator>() != null)
         {
             this.GetComponent<Animator>().SetTrigger(animiatorDiedID);
+        }
+    }
+
+    // UpdateUI changes the current health displayed on the HUD
+    // if the charactor is the current player
+    void UpdateUI()
+    {
+        if (player)
+        {
+            scoreUI.GetComponent<ScoreUI>().UpdateHealth(currentHealth);
         }
     }
 }
