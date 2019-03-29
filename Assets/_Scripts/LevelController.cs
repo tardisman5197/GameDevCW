@@ -38,6 +38,12 @@ public class LevelController : MonoBehaviour
     // infoUI is the HUD 
     public GameObject infoUI;
 
+    // won variables
+    public bool won;
+    public GameObject wonUI;
+
+    public GameObject respawnUI;
+
     // LvlSave is used to store the score of the player
     [Serializable]
     public struct LvlSave
@@ -53,6 +59,7 @@ public class LevelController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        won = false;
         players = new List<PastPlayer>();
         noOfEnemyDeaths = 0;
 
@@ -65,11 +72,14 @@ public class LevelController : MonoBehaviour
     void Update()
     {
         // Check if the player has won
-        if (army.transform.childCount <= noOfEnemyDeaths)
+        if (army.transform.childCount <= noOfEnemyDeaths && !won)
         {
             Debug.Log("Won!!");
-            Save();
-            SceneManager.LoadSceneAsync("LevelSelect");
+            won = true;
+            wonUI.SetActive(true);
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            Time.timeScale = 0;
         }
     }
 
@@ -137,12 +147,10 @@ public class LevelController : MonoBehaviour
 
         AddPlayer(player);
 
-        ResetScene();
-
-        Debug.Log("New player");
-        NewPlayer();
-
-        infoUI.GetComponent<ScoreUI>().AddDeath();
+        respawnUI.SetActive(true);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        Time.timeScale = 0;
     }
 
     // NewPlayer 
@@ -167,7 +175,7 @@ public class LevelController : MonoBehaviour
         noOfEnemyDeaths++;
     }
 
-    // Save creates an xml document contating the lvl information
+    // Save creates an xml document contati g the lvl information
     public void Save()
     {
         System.IO.Directory.CreateDirectory("saves");
@@ -182,5 +190,43 @@ public class LevelController : MonoBehaviour
             xmlDocument.Load(stream);
             xmlDocument.Save(filename);
         }
+    }
+
+    // LevelSelect saves and goes back to the level select
+    // scene
+    public void LevelSelect()
+    {
+        Save();
+        SceneManager.LoadSceneAsync("LevelSelect");
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Time.timeScale = 1;
+    }
+
+    // Mainmenu saves and goes back to the main menu
+    // scene
+    public void MainMenu()
+    {
+        Save();
+        SceneManager.LoadSceneAsync("MainMenu");
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        Time.timeScale = 1;
+    }
+
+    // Resume is called when the respawn button is pressed
+    public void Respawn()
+    {
+        ResetScene();
+
+        Debug.Log("New player");
+        NewPlayer();
+
+        infoUI.GetComponent<ScoreUI>().AddDeath();
+
+        respawnUI.SetActive(false);
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Time.timeScale = 1;
     }
 }
