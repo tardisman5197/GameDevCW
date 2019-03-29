@@ -16,7 +16,19 @@ public class LevelController : MonoBehaviour
     public GameObject player;
     public Transform startTransform;
     // players stores the previous lives of a player.
-    public List<GameObject> players;
+    private class PastPlayer {
+        public Dictionary<int, CharacterMotor.Action> actions;
+        public Vector3 position;
+        public Quaternion rotation;
+
+        public PastPlayer(Dictionary<int, CharacterMotor.Action> actions, Vector3 position, Quaternion rotation)
+        {
+            this.actions = actions;
+            this.position = position;
+            this.rotation = rotation;
+        }
+    }
+    private List<PastPlayer> players;
 
     public GameObject infoUI;
 
@@ -34,7 +46,7 @@ public class LevelController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        players = new List<GameObject>();
+        players = new List<PastPlayer>();
         noOfEnemyDeaths = 0;
         SpawnArmy();
         NewPlayer();
@@ -57,7 +69,12 @@ public class LevelController : MonoBehaviour
     {
         newPlayer.GetComponent<CharacterMotor>().dead = true;
         newPlayer.GetComponent<HealthController>().player = false;
-        players.Add(newPlayer);
+
+        players.Add(new PastPlayer(
+            newPlayer.GetComponent<CharacterMotor>().GetActions(),
+            newPlayer.GetComponent<CharacterMotor>().startPosition,
+            newPlayer.GetComponent<CharacterMotor>().startRotation)
+        );
     }
 
     // CleanUpScene removes all the players and armies from the scene.
@@ -68,6 +85,11 @@ public class LevelController : MonoBehaviour
         for (int i =0; i<enemys.Length; i++)
         {
             Destroy(enemys[i]);
+        }
+        GameObject[] playerObjs = GameObject.FindGameObjectsWithTag("Player");
+        for (int i = 0; i < playerObjs.Length; i++)
+        {
+            Destroy(playerObjs[i]);
         }
     }
 
@@ -84,7 +106,9 @@ public class LevelController : MonoBehaviour
         Debug.Log("Spawning Players");
         for (int i=0; i<players.Count; i++)
         {
-            players[i].GetComponent<CharacterMotor>().Reset();
+            GameObject newPlayer = Instantiate(player, players[i].position, players[i].rotation);
+            newPlayer.GetComponent<CharacterMotor>().Reset(players[i].actions);
+            newPlayer.GetComponent<HealthController>().player = false;
         }
     }
 

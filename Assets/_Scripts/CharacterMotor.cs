@@ -32,8 +32,8 @@ public class CharacterMotor : MonoBehaviour
     public bool dead;
     public int currentTick;
 
-    enum Type { Move, Strike, Jump };
-    private class Action
+    public enum Type { Move, Strike, Jump };
+    public class Action
     {
         public Type actionType;
         public Vector3 position;
@@ -208,19 +208,19 @@ public class CharacterMotor : MonoBehaviour
         }
     }
 
-    public void Reset()
+    public void Reset(Dictionary<int, Action> actions)
     {
         Debug.Log("Resetting Character");
-        // Broken
-        this.GetComponent<Animator>().applyRootMotion = false;
-        this.GetComponent<Animator>().rootPosition = startPosition;
-        transform.parent.transform.SetPositionAndRotation(startPosition, startRotation);
-        this.GetComponent<Animator>().applyRootMotion = true;
-
-
+        dead = true;
+        this.actions = actions;
         this.currentTick = 0;
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedFowardID, 0);
         this.GetComponent<Animator>().SetFloat(animiatorWalkingSpeedLeftID, 0);
         this.GetComponent<Animator>().SetTrigger(animiatorResetID);
+    }
+
+    public Dictionary<int, Action> GetActions()
+    {
+        return actions;
     }
 }
