@@ -82,7 +82,7 @@ public class CharacterMotor : MonoBehaviour
             else
             {
 
-                if (Input.GetButton("Jump"))
+                if (Input.GetButtonDown("Jump"))
                 {
                     Jump();
                 }
