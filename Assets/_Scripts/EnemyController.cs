@@ -17,6 +17,7 @@ public class EnemyController : MonoBehaviour
     // Animation ids
     private int speedHashId;
     private int attackId;
+    private int deadId;
 
     private bool dead;
 
@@ -26,11 +27,13 @@ public class EnemyController : MonoBehaviour
     {
         speedHashId = Animator.StringToHash("speed");
         attackId = Animator.StringToHash("attack");
+        deadId = Animator.StringToHash("dead");
 
         navMeshAgent = GetComponent<NavMeshAgent>();
         animController = GetComponent<Animator>();
 
         dead = false;
+        animController.SetBool(deadId, false);
 
         target = null;
         navMeshAgent.SetDestination(transform.position);
@@ -87,21 +90,30 @@ public class EnemyController : MonoBehaviour
     // animation.
     void Chase()
     {
-        navMeshAgent.SetDestination(target.transform.position);
-        navMeshAgent.stoppingDistance = 2;
-        animController.SetFloat(speedHashId, 1);
+        if (!dead)
+        {
+            navMeshAgent.SetDestination(target.transform.position);
+            navMeshAgent.stoppingDistance = 2;
+            animController.SetFloat(speedHashId, 1);
+        }
     }
 
     // Idle changes the animation state 
     void Idle()
     {
-        animController.SetFloat(speedHashId, 0.0f);
+        if (!dead)
+        {
+            animController.SetFloat(speedHashId, 0.0f);
+        }
     }
 
     // Attack changes the animation state
     void Attack()
     {
-        animController.SetTrigger(attackId);
+        if (!dead)
+        {
+            animController.SetTrigger(attackId);
+        }
     }
 
     // Dead updates the dead variable.
@@ -109,6 +121,7 @@ public class EnemyController : MonoBehaviour
     {
         Debug.Log("Dead");
         dead = true;
+        animController.SetBool(deadId, true);
         state = AgentState.Dead;
         navMeshAgent.SetDestination(transform.position);
     }
