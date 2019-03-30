@@ -10,10 +10,11 @@ public class HealthController : MonoBehaviour
     public string switchSceneOnDeath = "";
     public AudioSource hitSound;
 
-    private bool dead;
+    public bool dead;
 
     // Animation IDs
     private int animiatorDiedID;
+    private int animiatorDeadID;
 
     // player is true if this charactor is the controlled by the player
     public bool player;
@@ -28,6 +29,7 @@ public class HealthController : MonoBehaviour
         this.dead = false;
 
         this.animiatorDiedID = Animator.StringToHash("death");
+        this.animiatorDeadID = Animator.StringToHash("dead");
 
         scoreUI = GameObject.Find("Score");
 
@@ -104,6 +106,7 @@ public class HealthController : MonoBehaviour
         if (this.GetComponent<Animator>() != null)
         {
             this.GetComponent<Animator>().SetTrigger(animiatorDiedID);
+            this.GetComponent<Animator>().SetBool(animiatorDeadID, true);
         }
     }
 

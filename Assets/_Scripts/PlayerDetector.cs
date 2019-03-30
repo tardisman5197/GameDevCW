@@ -13,14 +13,31 @@ public class PlayerDetector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (transform.parent.GetComponent<EnemyController>().target != null)
+        {
+            if (transform.parent.GetComponent<EnemyController>().target.GetComponent<HealthController>() != null)
+            {
+                if (transform.parent.GetComponent<EnemyController>().target.GetComponent<HealthController>().dead)
+                {
+                    transform.parent.GetComponent<EnemyController>().target = null;
+                }
+            }
+        }
+
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")
         {
-            Debug.Log("New Target");
-            transform.parent.GetComponent<EnemyController>().target = other.gameObject;
+            if (other.gameObject.GetComponent<HealthController>() != null)
+            {
+                if (!other.gameObject.GetComponent<HealthController>().dead)
+                {
+                    Debug.Log("New Target");
+                    transform.parent.GetComponent<EnemyController>().target = other.gameObject;
+                }
+            }
         }
     }
 
