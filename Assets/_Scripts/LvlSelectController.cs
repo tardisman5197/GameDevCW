@@ -28,6 +28,10 @@ public class LvlSelectController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         // Load in the scores of all the rounds
 
         LvlSave save = Load("saves/Lvl1.xml");
@@ -53,6 +57,7 @@ public class LvlSelectController : MonoBehaviour
     // Load returns the information stored about a level save
     public LvlSave Load(string filename)
     {
+        System.IO.Directory.CreateDirectory("saves");
         LvlSave state = new LvlSave(-1);
         if (File.Exists(filename))
         {

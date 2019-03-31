@@ -22,7 +22,12 @@ public class MainMenuController : MonoBehaviour
     public void ButtonHandlerPlay()
     {
         // New game so delete saves
-        Directory.Delete("saves", true);
+        try {
+            Directory.Delete("saves", true);
+        } catch
+        {
+
+        }
         SceneManager.LoadSceneAsync("LevelSelect");
 
     }

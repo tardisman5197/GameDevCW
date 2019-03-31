@@ -56,6 +56,8 @@ public class LevelController : MonoBehaviour
         }
     }
 
+    public string filename;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -179,7 +181,6 @@ public class LevelController : MonoBehaviour
     public void Save()
     {
         System.IO.Directory.CreateDirectory("saves");
-        string filename = "saves/lvl1.xml";
         XmlDocument xmlDocument = new XmlDocument();
         LvlSave state = new LvlSave(players.Count);
         XmlSerializer serializer = new XmlSerializer(typeof(LvlSave));
