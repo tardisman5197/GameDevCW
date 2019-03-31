@@ -1783,7 +1783,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 42e65e088b3f4374e851b8dbd38f3df9, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 570da2f6950e1884080683e64cd78088, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -1909,8 +1909,10 @@ MonoBehaviour:
   maxHealth: 20
   currentHealth: 0
   switchSceneOnDeath: 
-  hitSound: {fileID: 0}
+  hitSound: {fileID: 5939952396848430909}
+  dead: 0
   player: 0
+  scoreUI: {fileID: 0}
 --- !u!136 &4607940573609242120
 CapsuleCollider:
   m_ObjectHideFlags: 0

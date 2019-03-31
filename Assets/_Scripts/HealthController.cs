@@ -63,7 +63,10 @@ public class HealthController : MonoBehaviour
     {
         currentHealth -= amount;
 
-        //hitSound.Play();
+        if (hitSound != null)
+        {
+            hitSound.Play();
+        }
 
         // Update the UI if this is the player
         UpdateUI();
